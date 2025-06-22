@@ -1,0 +1,475 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+		sans-serif;
+	line-height: 1.6;
+}
+
+/* Main Auth Wrapper */
+.auth-wrapper {
+	min-width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f8f9fa;
+}
+
+.auth-container {
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	padding: 0;
+}
+
+.form-container {
+	width: 100%;
+	background: white;
+	border-radius: 0;
+	box-shadow: none;
+	height: 100%;
+}
+
+/* Login Page Styles */
+.login-container {
+	width: 100%;
+	display: flex;
+	min-height: 100vh;
+}
+
+.content-section {
+	flex: 1;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 40px 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.content-wrapper {
+	max-width: 50%;
+	text-align: center;
+}
+
+.logo-icon {
+	width: 50px;
+	height: 50px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 15px;
+	backdrop-filter: blur(10px);
+}
+
+.logo-icon-text {
+	font-size: 20px;
+	font-weight: bold;
+	color: white;
+}
+
+.description-text {
+	font-size: 16px;
+	line-height: 1.6;
+	opacity: 0.9;
+	margin: 0;
+}
+
+/* Form Section */
+.form-section {
+	flex: 1;
+	padding: 40px 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.form-wrapper {
+	width: 100%;
+}
+
+.form-title {
+	font-size: 24px;
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 6px;
+}
+
+/* Success Message */
+.success-message {
+	background: #d4edda;
+	color: #155724;
+	padding: 12px;
+	border-radius: 8px;
+	margin-bottom: 20px;
+	font-size: 14px;
+	border: 1px solid #c3e6cb;
+	display: none;
+	align-items: center;
+}
+
+.success-icon {
+	margin-right: 8px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+/* Error Message */
+.error-message {
+	background: #f8d7da;
+	color: #721c24;
+	padding: 12px;
+	border-radius: 8px;
+	margin-bottom: 15px;
+	font-size: 14px;
+	border: 1px solid #f5c6cb;
+	display: none;
+}
+
+/* Input Groups */
+.input-group {
+	margin-bottom: 15px;
+	position: relative;
+}
+
+.input-label {
+	display: block;
+	font-size: 14px;
+	font-weight: 500;
+	color: #333;
+	margin-bottom: 8px;
+}
+
+.input-field {
+	width: 100%;
+	padding: 10px 14px;
+	padding-right: 40px; /* Space for validation icon */
+	border: 2px solid #e1e5e9;
+	border-radius: 8px;
+	font-size: 14px;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	background: white;
+}
+
+.input-field:focus {
+	outline: none;
+	border-color: #667eea;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-field.valid {
+	border-color: #28a745;
+	background-color: #f8fff9;
+}
+
+.input-field.invalid {
+	border-color: #dc3545;
+	background-color: #fff8f8;
+}
+
+.input-field::placeholder {
+	color: #999;
+}
+
+.input-field:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* Field validation messages */
+.field-error {
+	color: #dc3545;
+	font-size: 12px;
+	margin-top: 5px;
+	display: none;
+	font-weight: 500;
+}
+
+.field-success {
+	color: #28a745;
+	font-size: 12px;
+	margin-top: 5px;
+	display: none;
+	font-weight: 500;
+}
+
+/* Validation icons */
+.validation-icon {
+	position: absolute;
+	right: 12px;
+	top: 36px;
+	font-size: 16px;
+	font-weight: bold;
+	display: none;
+	pointer-events: none;
+}
+
+.validation-icon.success {
+	color: #28a745;
+}
+
+.validation-icon.error {
+	color: #dc3545;
+}
+
+/* Form Options */
+.form-options {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.remember-me {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.checkbox {
+	margin-right: 8px;
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+}
+
+.checkbox-label {
+	font-size: 14px;
+	color: #666;
+	cursor: pointer;
+}
+
+.terms-link {
+	color: #667eea;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.terms-link:hover {
+	text-decoration: underline;
+}
+
+/* Buttons */
+.sign-in-button {
+	width: 100%;
+	padding: 12px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.3s ease;
+	margin-bottom: 20px;
+}
+
+.sign-in-button:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.sign-in-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+/* Auth Switch */
+.auth-switch {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.auth-switch-text {
+	color: #666;
+	font-size: 14px;
+}
+
+.auth-switch-link {
+	color: #667eea;
+	font-weight: 500;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+.auth-switch-link:hover {
+	color: #5a6fd8;
+	text-decoration: underline;
+}
+
+/* Loading spinner */
+.loading-spinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-radius: 50%;
+	border-top-color: white;
+	animation: spin 1s ease-in-out infinite;
+	margin-right: 8px;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* Password strength indicator */
+.password-strength {
+	margin-top: 5px;
+	font-size: 12px;
+}
+
+.password-strength.weak {
+	color: #dc3545;
+}
+
+.password-strength.medium {
+	color: #ffc107;
+}
+
+.password-strength.strong {
+	color: #28a745;
+}
+
+/* Form focus styles */
+.input-field:focus + .validation-icon {
+	opacity: 0.5;
+}
+/* Password toggle styles */
+.password-wrapper {
+	position: relative;
+}
+
+.password-toggle {
+	position: absolute;
+	right: 45px;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 5px;
+	color: #666;
+	font-size: 16px;
+	z-index: 2;
+	transition: color 0.2s ease;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.password-toggle:hover {
+	color: #333;
+}
+
+.password-toggle:focus {
+	outline: none;
+	color: #007bff;
+}
+
+/* SVG icon styles */
+.password-toggle svg {
+	width: 18px;
+	height: 18px;
+	fill: currentColor;
+}
+
+/* Adjust input padding to make room for toggle button */
+.password-wrapper .input-field {
+	padding-right: 80px;
+}
+
+/* Adjust validation icon position for password fields */
+.password-wrapper .validation-icon {
+	right: 15px;
+}
+/* Shake animation for errors */
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	10%,
+	30%,
+	50%,
+	70%,
+	90% {
+		transform: translateX(-5px);
+	}
+	20%,
+	40%,
+	60%,
+	80% {
+		transform: translateX(5px);
+	}
+}
+
+.shake {
+	animation: shake 0.5s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+	.login-container {
+		flex-direction: column;
+	}
+
+	.content-section {
+		padding: 40px 20px;
+	}
+
+	.form-section {
+		padding: 40px 20px;
+	}
+
+	.form-title {
+		font-size: 24px;
+	}
+
+	.content-wrapper {
+		max-width: 80%;
+	}
+
+	.validation-icon {
+		top: 34px;
+	}
+}
+
+@media (max-width: 480px) {
+	.auth-container {
+		padding: 10px;
+	}
+
+	.content-section,
+	.form-section {
+		padding: 30px 15px;
+	}
+
+	.content-wrapper {
+		max-width: 90%;
+	}
+
+	.input-field {
+		padding-right: 35px;
+	}
+
+	.validation-icon {
+		right: 10px;
+		font-size: 14px;
+	}
+}

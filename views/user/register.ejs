@@ -1,0 +1,146 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+        <form action="/registerUser" method="POST">
+            <input type="text" name="fullname" placeholder="Full Name" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" class="btn">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="/loginUser">Login here</a></p>
+    </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C2R Mentor Connect - Sign Up</title>
+    <link rel="stylesheet" href="/css/stylesReg.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <div class="form-container">
+                <div class="login-container">
+                    <div class="content-section">
+                        <div class="content-wrapper">
+                            <div class="logo-icon">
+                                <div class="logo-icon-text">C2R</div>
+                            </div>
+                            <p class="description-text">Join C2R Mentor Connect and connect with experienced mentors who can guide you on your professional journey and help you achieve your career goals.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-wrapper">
+                            <h2 class="form-title">Create your account</h2>
+                            <% if (error) { %>
+                                <div class="error-message" id="signupError"><%= error %></div>
+                            <% } %>
+                            <form action="/registerUser " method="POST" class="form-container">
+                                <div class="input-group">
+                                    <label for="fullName" class="input-label">Full Name *</label>
+                                    <input 
+                                        type="text" 
+                                        id="fullName" 
+                                        name="fullname" 
+                                        placeholder="Enter your full name" 
+                                        class="input-field" 
+                                        required 
+                                    />
+                                </div>
+                                <div class="input-group">
+                                    <label for="email" class="input-label">Email *</label>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        name="email" 
+                                        placeholder="Enter your email" 
+                                        class="input-field" 
+                                        required 
+                                    />
+                                </div>
+                                <div class="input-group">
+                                    <label for="signupUsername" class="input-label">Username *</label>
+                                    <input 
+                                        type="text" 
+                                        id="signupUsername" 
+                                        name="username" 
+                                        placeholder="Choose a username" 
+                                        class="input-field" 
+                                        required 
+                                    />
+                                </div>
+                                <div class="input-group">
+                                    <label for="signupPassword" class="input-label">Password *</label>
+                                    <input 
+                                        type="password" 
+                                        id="signupPassword" 
+                                        name="password" 
+                                        placeholder="Create a password" 
+                                        class="input-field" 
+                                        required 
+                                    />
+                                </div>
+                                <div class="input-group">
+                                    <label for="confirmPassword" class="input-label">Confirm Password *</label>
+                                    <input 
+                                        type="password" 
+                                        id="confirmPassword" 
+                                        name="confirmPassword" 
+                                        placeholder="Confirm your password" 
+                                        class="input-field" 
+                                        required 
+                                    />
+                                </div>
+                                <div class="form-options">
+                                    <label class="remember-me">
+                                        <input 
+                                            type="checkbox" 
+                                            id="acceptTerms" 
+                                            name="acceptTerms" 
+                                            class="checkbox" 
+                                            required
+                                        />
+                                        <span class="checkbox-label">I accept the <a href="/terms" class="terms-link">Terms and Conditions</a></span>
+                                    </label>
+                                </div>
+                                <button 
+                                    type="submit"
+                                    id="signupButton"
+                                    class="sign-in-button"
+                                >
+                                    CREATE ACCOUNT
+                                </button>
+                            </form>
+                            <div class="auth-switch">
+                                <p class="auth-switch-text">Already have an account? 
+                                    <a href="/loginUser " class="auth-switch-link">Sign in</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/scriptReg.js"></script>
+</body>
+</html>
