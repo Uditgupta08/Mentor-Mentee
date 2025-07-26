@@ -6,14 +6,14 @@ const { QueryTypes } = require("sequelize");
  * Insert a new user and return the created row.
  */
 async function createUser({ fullname, username, email, password }) {
-	const sql = `
+	const query = `
     INSERT INTO "Users"
       (fullname, username, email, password, "createdAt", "updatedAt")
     VALUES
       (:fullname, :username, :email, :password, NOW(), NOW())
     RETURNING *;
   `;
-	const [rows] = await sequelize.query(sql, {
+	const [rows] = await sequelize.query(query, {
 		replacements: { fullname, username, email, password },
 		type: QueryTypes.INSERT,
 	});
@@ -25,13 +25,13 @@ async function createUser({ fullname, username, email, password }) {
  * Find one user by username OR email.
  */
 async function findByUsernameOrEmail(username, email) {
-	const sql = `
+	const query = `
     SELECT *
     FROM "Users"
     WHERE username = :username OR email = :email
     LIMIT 1;
   `;
-	const users = await sequelize.query(sql, {
+	const users = await sequelize.query(query, {
 		replacements: { username, email },
 		type: QueryTypes.SELECT,
 	});
@@ -42,13 +42,13 @@ async function findByUsernameOrEmail(username, email) {
  * Find a user by its primary key.
  */
 async function findById(id) {
-	const sql = `
+	const query = `
     SELECT *
     FROM "Users"
     WHERE id = :id
     LIMIT 1;
   `;
-	const users = await sequelize.query(sql, {
+	const users = await sequelize.query(query, {
 		replacements: { id },
 		type: QueryTypes.SELECT,
 	});
@@ -59,13 +59,13 @@ async function findById(id) {
  * Find a user by username.
  */
 async function findByUsername(username) {
-	const sql = `
+	const query = `
     SELECT *
     FROM "Users"
     WHERE username = :username
     LIMIT 1;
   `;
-	const users = await sequelize.query(sql, {
+	const users = await sequelize.query(query, {
 		replacements: { username },
 		type: QueryTypes.SELECT,
 	});
@@ -76,12 +76,12 @@ async function findByUsername(username) {
  * Update only the password field for a given user ID.
  */
 async function updatePassword(id, newHashedPassword) {
-	const sql = `
+	const query = `
     UPDATE "Users"
     SET password = :password, "updatedAt" = NOW()
     WHERE id = :id;
   `;
-	const [result] = await sequelize.query(sql, {
+	const [result] = await sequelize.query(query, {
 		replacements: { id, password: newHashedPassword },
 		type: QueryTypes.UPDATE,
 	});
@@ -92,11 +92,11 @@ async function updatePassword(id, newHashedPassword) {
  * Delete a user by ID.
  */
 async function deleteUser(id) {
-	const sql = `
+	const query = `
     DELETE FROM "Users"
     WHERE id = :id;
   `;
-	const result = await sequelize.query(sql, {
+	const result = await sequelize.query(query, {
 		replacements: { id },
 		type: QueryTypes.DELETE,
 	});
