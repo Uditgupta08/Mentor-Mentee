@@ -38,6 +38,31 @@ const registerMentee = async (req, res) => {
 };
 
 // Login mentee
+// const loginMentee = async (req, res) => {
+// 	const { email, password } = req.body;
+// 	try {
+// 		const user = await User.findOne({
+// 			where: { email },
+// 			include: { model: Role, as: "role" },
+// 		});
+// 		if (!user || user.role.name !== "mentee") {
+// 			return res.status(401).json({ message: "Invalid credentials" });
+// 		}
+// 		const isMatch = await user.comparePassword(password);
+// 		if (!isMatch)
+// 			return res.status(401).json({ message: "Invalid credentials" });
+
+// 		const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+// 			expiresIn: "7d",
+// 		});
+// 		res.cookie("token", token, { httpOnly: true });
+// 		return res.json({ token });
+// 	} catch (err) {
+// 		console.error(err);
+// 		return res.status(500).json({ message: "Server error" });
+// 	}
+// };
+
 const loginMentee = async (req, res) => {
 	const { email, password } = req.body;
 	try {
@@ -45,20 +70,36 @@ const loginMentee = async (req, res) => {
 			where: { email },
 			include: { model: Role, as: "role" },
 		});
-		if (!user || user.role.name !== "mentee") {
+
+		if (!user) {
+			console.error("User not found for email:", email);
 			return res.status(401).json({ message: "Invalid credentials" });
 		}
+
+		if (!user.comparePassword) {
+			console.error("comparePassword method is missing from user");
+			console.error("User instance:", user.toJSON());
+			return res.status(500).json({ message: "Server error" });
+		}
+
 		const isMatch = await user.comparePassword(password);
-		if (!isMatch)
-			return res.status(401).json({ message: "Invalid credentials" });
+		// if (!isMatch) {
+		// 	console.error("Password mismatch for:", email);
+		// 	return res.status(401).json({ message: "Invalid credentials" });
+		// }
+		if (!isMatch) {
+			return res
+				.status(401)
+				.json({ success: false, message: "Invalid credentials" });
+		}
 
 		const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
 			expiresIn: "7d",
 		});
 		res.cookie("token", token, { httpOnly: true });
-		return res.json({ token });
+		return res.json({ success: true, token });
 	} catch (err) {
-		console.error(err);
+		console.error("🔥 loginMentee error:", err);
 		return res.status(500).json({ message: "Server error" });
 	}
 };

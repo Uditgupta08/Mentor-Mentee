@@ -5,6 +5,8 @@ const { Role } = require("../models");
 
 // POST /roles
 // Body: { name: string, description?: string }
+
+// mentee, mentor, superadmin, admin, corporate
 router.post("/", async (req, res) => {
 	const { name, description } = req.body;
 	if (!name) {

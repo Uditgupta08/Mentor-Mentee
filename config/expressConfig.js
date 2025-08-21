@@ -10,7 +10,15 @@ const passport = require("passport");
 const expressConfig = (app) => {
 	app.use(bodyParser.json());
 	app.use(express.urlencoded({ extended: true }));
-	app.use(cors());
+	app.use(
+		cors({
+			origin: "http://localhost:3001", // match your React app
+			methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+			allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+			credentials: true,
+		})
+	);
+
 	app.use(cookieParser());
 	app.use(methodOverride("_method"));
 	app.use(express.static(path.join(__dirname, "../public")));

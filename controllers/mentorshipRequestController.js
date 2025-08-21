@@ -1,16 +1,55 @@
 // controllers/mentorshipRequestController.js
 const { Op } = require("sequelize");
-const MentorshipRequest = require("../models/mentorshipRequest");
-const Session = require("../models/session");
-const { requireRole } = require("../middleware/authMiddleware");
+const { Session, MentorshipRequest, User, Role } = require("../models");
 
 // Mentee sends a new mentorship request
 // POST /requests
-// body: { mentorId }
+// body: { mentorId, message? }
 const sendRequest = async (req, res) => {
 	try {
+		if (!req.user || !req.user.id) {
+			return res.status(401).json({ error: "Not authenticated." });
+		}
+
+		// Normalize role name (handles string or object)
+		const roleName =
+			typeof req.user.role === "string"
+				? req.user.role
+				: req.user.role && req.user.role.name
+				? req.user.role.name
+				: null;
+
+		// Only mentees should be allowed to send requests
+		if (String(roleName).toLowerCase() !== "mentee") {
+			return res
+				.status(403)
+				.json({ error: "Only mentees can send mentorship requests." });
+		}
+
 		const menteeId = req.user.id;
-		const { mentorId } = req.body;
+		const { mentorId, message } = req.body;
+
+		if (!mentorId) {
+			return res.status(400).json({ error: "mentorId is required." });
+		}
+
+		// Prevent asking self (extra safety)
+		if (String(mentorId) === String(menteeId)) {
+			return res
+				.status(400)
+				.json({ error: "You cannot send a request to yourself." });
+		}
+
+		// Validate mentor exists and has role 'mentor'
+		const mentor = await User.findByPk(mentorId, {
+			include: { model: Role, as: "role" },
+		});
+		if (!mentor) return res.status(404).json({ error: "Mentor not found." });
+		const mentorRoleName =
+			typeof mentor.role === "string" ? mentor.role : mentor.role?.name;
+		if (String(mentorRoleName).toLowerCase() !== "mentor") {
+			return res.status(400).json({ error: "Specified user is not a mentor." });
+		}
 
 		// prevent duplicate pending requests
 		const existing = await MentorshipRequest.findOne({
@@ -20,27 +59,32 @@ const sendRequest = async (req, res) => {
 			return res.status(400).json({ error: "Request already pending." });
 		}
 
-		const reqRecord = await MentorshipRequest.create({ mentorId, menteeId });
-		res.status(201).json(reqRecord);
+		const reqRecord = await MentorshipRequest.create({
+			mentorId,
+			menteeId,
+			message: message || null,
+		});
+
+		return res.status(201).json({ request: reqRecord });
 	} catch (err) {
 		console.error("sendRequest:", err);
-		res.status(500).json({ error: "Could not send request." });
+		return res.status(500).json({ error: "Could not send request." });
 	}
 };
 
 // Mentor accepts or rejects a request
 // PATCH /requests/:id/respond
-// body: { status: "ACCEPTED"|"REJECTED", scheduledTime?, duration?, comments? }
+// body: { status: "ACCEPTED"|"REJECTED", scheduledTime?, duration?, comments?, topic? }
 const respondRequest = [
-	requireRole("mentor"),
+	// route should apply authorizeRole("mentor") middleware
 	async (req, res) => {
 		try {
 			const { id } = req.params;
-			const { status, scheduledTime, duration, comments } = req.body;
+			const { status, scheduledTime, duration, comments, topic } = req.body;
 
 			// fetch the request, ensure it’s addressed to this mentor
 			const reqRec = await MentorshipRequest.findByPk(id);
-			if (!reqRec || reqRec.mentorId !== req.user.id) {
+			if (!reqRec || String(reqRec.mentorId) !== String(req.user.id)) {
 				return res.status(404).json({ error: "Request not found." });
 			}
 			if (!["ACCEPTED", "REJECTED"].includes(status)) {
@@ -55,11 +99,9 @@ const respondRequest = [
 			let session = null;
 			if (status === "ACCEPTED") {
 				if (!scheduledTime || !duration) {
-					return res
-						.status(400)
-						.json({
-							error: "scheduledTime & duration required to create session.",
-						});
+					return res.status(400).json({
+						error: "scheduledTime & duration required to create session.",
+					});
 				}
 				session = await Session.create({
 					mentorId: req.user.id,
@@ -67,15 +109,20 @@ const respondRequest = [
 					scheduledTime: new Date(scheduledTime),
 					duration,
 					comments: comments || null,
+					topic: topic || null,
+					status: "SCHEDULED",
 				});
 			}
 
-			res.json({ request: reqRec, session });
+			return res.json({ request: reqRec, session });
 		} catch (err) {
 			console.error("respondRequest:", err);
-			res.status(500).json({ error: "Could not respond to request." });
+			return res.status(500).json({ error: "Could not respond to request." });
 		}
 	},
 ];
 
-module.exports = { sendRequest, respondRequest };
+module.exports = {
+	sendRequest,
+	respondRequest,
+};

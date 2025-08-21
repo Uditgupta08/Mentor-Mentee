@@ -1,14 +1,20 @@
 // controllers/sessionController.js
-const Session = require("../models/session");
-const { requireRole } = require("../middleware/authMiddleware");
+const { Session } = require("../models");
 
 // GET /sessions
 // If mentor: returns sessions where mentorId = current user
 // If mentee: where menteeId = current user
 const listMySessions = async (req, res) => {
 	try {
+		const roleName =
+			typeof req.user.role === "string"
+				? req.user.role
+				: req.user.role && req.user.role.name
+				? req.user.role.name
+				: null;
+
 		const where =
-			req.user.role === "mentor"
+			String(roleName).toLowerCase() === "mentor"
 				? { mentorId: req.user.id }
 				: { menteeId: req.user.id };
 
@@ -16,10 +22,10 @@ const listMySessions = async (req, res) => {
 			where,
 			order: [["scheduledTime", "ASC"]],
 		});
-		res.json(sessions);
+		return res.json({ sessions });
 	} catch (err) {
 		console.error("listMySessions:", err);
-		res.status(500).json({ error: "Could not fetch sessions." });
+		return res.status(500).json({ error: "Could not fetch sessions." });
 	}
 };
 

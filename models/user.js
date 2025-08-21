@@ -65,9 +65,9 @@ User.beforeUpdate(async (user) => {
 });
 
 // Instance method
-User.prototype.comparePassword = function (candidate) {
+User.prototype.comparePassword = async function (candidate) {
 	if (!this.password) return false;
-	return bcrypt.compare(candidate, this.password);
+	return await bcrypt.compare(candidate, this.password);
 };
 
 module.exports = User;

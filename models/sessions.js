@@ -21,6 +21,14 @@ const Session = sequelize.define(
 			type: DataTypes.TEXT,
 			allowNull: true,
 		},
+		topic: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		feedbackRating: {
+			type: DataTypes.FLOAT,
+			allowNull: true,
+		},
 		status: {
 			type: DataTypes.ENUM("SCHEDULED", "COMPLETED", "CANCELLED"),
 			defaultValue: "SCHEDULED",

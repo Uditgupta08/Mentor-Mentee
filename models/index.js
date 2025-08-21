@@ -5,6 +5,7 @@ const Sequelize = require("sequelize");
 const User = require("./user");
 const Role = require("./role");
 const MentorProfile = require("./mentor");
+const MentorAvailability = require("./mentorAvailability");
 const MenteeProfile = require("./mentee");
 const MentorshipRequest = require("./mentorShipRequests");
 const Session = require("./sessions");
@@ -22,6 +23,13 @@ User.hasOne(MentorProfile, {
 	onDelete: "CASCADE",
 });
 MentorProfile.belongsTo(User, { foreignKey: "userId" });
+
+// MentorProfile <-> MentorAvailability
+User.hasMany(MentorAvailability, {
+	as: "availabilities",
+	foreignKey: "userId",
+});
+MentorAvailability.belongsTo(User, { as: "mentor", foreignKey: "userId" });
 
 // User <-> MenteeProfile
 User.hasOne(MenteeProfile, {
@@ -55,6 +63,7 @@ const db = {
 	MentorProfile,
 	MenteeProfile,
 	MentorshipRequest,
+	MentorAvailability,
 	Session,
 };
 
