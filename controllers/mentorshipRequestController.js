@@ -1,6 +1,7 @@
 // controllers/mentorshipRequestController.js
 const { Op } = require("sequelize");
 const { Session, MentorshipRequest, User, Role } = require("../models");
+const { parseTimeToMinutes } = require("./availabilityController");
 
 // Mentee sends a new mentorship request
 // POST /requests
@@ -103,10 +104,40 @@ const respondRequest = [
 						error: "scheduledTime & duration required to create session.",
 					});
 				}
+				const startTime = new Date(scheduledTime);
+				const endTime = new Date(startTime.getTime() + duration * 60000);
+
+				// check if mentor already has a conflicting session
+				const conflict = await Session.findOne({
+					where: {
+						mentorId: req.user.id,
+						status: "SCHEDULED",
+						[Op.or]: [
+							{
+								scheduledTime: {
+									[Op.between]: [startTime, endTime],
+								},
+							},
+							{
+								scheduledTime: { [Op.lte]: startTime },
+								endTime: { [Op.gte]: startTime },
+							},
+						],
+					},
+				});
+
+				if (conflict) {
+					return res
+						.status(400)
+						.json({ error: "Mentor is not available at this timeslot." });
+				}
+
+				// create the session
 				session = await Session.create({
 					mentorId: req.user.id,
 					menteeId: reqRec.menteeId,
-					scheduledTime: new Date(scheduledTime),
+					scheduledTime: startTime,
+					endTime, // <-- add endTime column in Session model if not already
 					duration,
 					comments: comments || null,
 					topic: topic || null,

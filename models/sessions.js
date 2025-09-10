@@ -13,6 +13,10 @@ const Session = sequelize.define(
 			type: DataTypes.DATE,
 			allowNull: false,
 		},
+		endTime: {
+			type: DataTypes.DATE,
+			allowNull: false,
+		},
 		duration: {
 			type: DataTypes.INTEGER,
 			allowNull: false,

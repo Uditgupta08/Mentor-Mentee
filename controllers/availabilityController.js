@@ -29,24 +29,19 @@ const expandAvailabilitiesToSlots = (
 	for (const a of availabilities) {
 		if (!a.isActive) continue;
 
-		if (a.isRecurring) {
+		if (a.recurrenceType === "weekly") {
 			if (typeof a.dayOfWeek !== "number") continue;
 			const windowStart = a.startDate
 				? new Date(a.startDate + "T00:00:00")
 				: from;
 			const windowEnd = a.endDate ? new Date(a.endDate + "T00:00:00") : to;
 
-			const startIter = new Date(
-				Math.max(from.getTime(), windowStart.getTime())
-			);
-			const endIter = new Date(Math.min(to.getTime(), windowEnd.getTime()));
-
 			for (
-				let d = new Date(startIter);
-				d <= endIter;
+				let d = new Date(windowStart);
+				d <= windowEnd;
 				d.setDate(d.getDate() + 1)
 			) {
-				if (d.getDay() === a.dayOfWeek) {
+				if (d >= from && d <= to && d.getDay() === a.dayOfWeek) {
 					slots.push({
 						availabilityId: a.id,
 						date: d.toISOString().slice(0, 10),
@@ -56,8 +51,28 @@ const expandAvailabilitiesToSlots = (
 					});
 				}
 			}
-		} else {
-			// one-off
+		} else if (a.recurrenceType === "daily") {
+			const windowStart = a.startDate
+				? new Date(a.startDate + "T00:00:00")
+				: from;
+			const windowEnd = a.endDate ? new Date(a.endDate + "T00:00:00") : to;
+
+			for (
+				let d = new Date(windowStart);
+				d <= windowEnd;
+				d.setDate(d.getDate() + 1)
+			) {
+				if (d >= from && d <= to) {
+					slots.push({
+						availabilityId: a.id,
+						date: d.toISOString().slice(0, 10),
+						startTime: a.startTime,
+						endTime: a.endTime,
+						timezone: a.timezone || null,
+					});
+				}
+			}
+		} else if (a.recurrenceType === "one-off") {
 			if (a.date) {
 				const d = new Date(a.date + "T00:00:00");
 				if (d >= from && d <= to) {
@@ -96,7 +111,7 @@ const createAvailability = async (req, res) => {
 
 		const userId = req.user.id;
 		const {
-			isRecurring = true,
+			recurrenceType = "one-off", // "one-off" | "weekly" | "daily"
 			dayOfWeek,
 			date,
 			startTime,
@@ -107,43 +122,54 @@ const createAvailability = async (req, res) => {
 		} = req.body;
 
 		// validation
-		if (!startTime || !endTime)
+		if (!["one-off", "weekly", "daily"].includes(recurrenceType)) {
+			return res.status(400).json({ message: "Invalid recurrenceType" });
+		}
+
+		if (!startTime || !endTime) {
 			return res
 				.status(400)
 				.json({ message: "startTime and endTime are required" });
+		}
 
 		const startMinutes = parseTimeToMinutes(startTime);
 		const endMinutes = parseTimeToMinutes(endTime);
-		if (startMinutes === null || endMinutes === null)
+		if (startMinutes === null || endMinutes === null) {
 			return res
 				.status(400)
 				.json({ message: "Invalid time format (expected HH:mm or HH:mm:ss)" });
-
-		if (startMinutes >= endMinutes)
+		}
+		if (startMinutes >= endMinutes) {
 			return res
 				.status(400)
 				.json({ message: "startTime must be before endTime" });
+		}
 
-		if (isRecurring && (dayOfWeek === undefined || dayOfWeek === null))
+		if (
+			recurrenceType === "weekly" &&
+			(dayOfWeek === undefined || dayOfWeek === null)
+		) {
 			return res.status(400).json({
-				message: "dayOfWeek is required for recurring availability (0-6)",
+				message: "dayOfWeek is required for weekly availability (0-6)",
 			});
+		}
 
-		if (!isRecurring && !date)
+		if (recurrenceType === "one-off" && !date) {
 			return res.status(400).json({
 				message: "date is required for one-off availability (YYYY-MM-DD)",
 			});
+		}
 
 		// create
 		const av = await MentorAvailability.create({
 			userId,
-			isRecurring,
-			dayOfWeek: isRecurring ? dayOfWeek : null,
-			date: !isRecurring ? date : null,
+			recurrenceType,
+			dayOfWeek: recurrenceType === "weekly" ? dayOfWeek : null,
+			date: recurrenceType === "one-off" ? date : null,
 			startTime,
 			endTime,
-			startDate: isRecurring ? startDate || null : null,
-			endDate: isRecurring ? endDate || null : null,
+			startDate: recurrenceType !== "one-off" ? startDate || null : null,
+			endDate: recurrenceType !== "one-off" ? endDate || null : null,
 			timezone: timezone || null,
 			isActive: true,
 		});
@@ -177,7 +203,7 @@ const updateAvailability = async (req, res) => {
 
 		// Only allow specific fields to be updated
 		const updatable = [
-			"isRecurring",
+			"recurrenceType",
 			"dayOfWeek",
 			"date",
 			"startTime",
@@ -265,7 +291,16 @@ const getMentorAvailability = async (req, res) => {
 		});
 
 		const slots = expandAvailabilitiesToSlots(availabilities, from, to);
-		return res.json({ slots });
+
+		// Group by date
+		const grouped = slots.reduce((acc, slot) => {
+			const { date, ...rest } = slot;
+			if (!acc[date]) acc[date] = [];
+			acc[date].push(rest);
+			return acc;
+		}, {});
+
+		return res.json({ slotsByDate: grouped });
 	} catch (err) {
 		console.error(err);
 		return res
@@ -279,5 +314,5 @@ module.exports = {
 	updateAvailability,
 	deleteAvailability,
 	getMentorAvailability,
-	expandAvailabilitiesToSlots, // exported for tests / reuse
+	expandAvailabilitiesToSlots,
 };

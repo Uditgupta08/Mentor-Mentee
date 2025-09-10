@@ -18,15 +18,15 @@ const MentorAvailability = sequelize.define(
 			allowNull: false,
 		},
 
-		// if true => recurring weekly event; if false => one-off event on `date`
-		isRecurring: {
-			type: DataTypes.BOOLEAN,
-			defaultValue: true,
+		recurrenceType: {
+			type: DataTypes.ENUM("one-off", "weekly", "daily"),
+			allowNull: false,
+			defaultValue: "one-off",
 		},
 
-		// for recurring: 0 (Sunday) .. 6 (Saturday)
+		// used if recurrenceType === "weekly"
 		dayOfWeek: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.INTEGER, // 0 (Sun) - 6 (Sat)
 			allowNull: true,
 		},
 

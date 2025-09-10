@@ -1,6 +1,7 @@
 // controllers/sessionController.js
 const { Session } = require("../models");
 
+
 // GET /sessions
 // If mentor: returns sessions where mentorId = current user
 // If mentee: where menteeId = current user
